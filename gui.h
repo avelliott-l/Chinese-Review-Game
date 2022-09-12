@@ -17,7 +17,7 @@ void print_by_char(WINDOW *win, char *string);
 * highlight: a an integer to indicate which choice is selected
 *
 */
-void print_menu(WINDOW *menu_win, int highlight, char **menu_choices, int n_choices);
+void print_menu();
 
 void print_yn_menu(WINDOW *win, int highlight, char **choices);
 

@@ -11,12 +11,37 @@
 * highlight: a an integer to indicate which choice is selected
 *
 */
-void print_menu(WINDOW *menu_win, int highlight, char **menu_choices, int n_choices) {
+void print_menu() {
 
-    int x = 2, y = 2;  // start coord values of 1st choice in menu
+    /* function choices for main menu */
+    char *menu_choices[] = {
+    "Review",
+    "Quiz me!",
+    "Add a new study set",
+    "View a study set",
+    "Delete a study set",
+    "Exit"
+    };
+    int n_choices = sizeof(menu_choices) / sizeof(char*);
+
+    /* create main menu */
+    int height = 11;
+    int width = 30;
+    int startx = (COLS - width) / 2;
+    int starty = (LINES - height) / 2;
+    int highlight = 1;
+    int choice = 0;  // keep track of which menu option is chosen
+
+    WINDOW *menu_win = newwin(height, width, starty, startx);
     box(menu_win, 0, 0);
+    wrefresh(menu_win); //
+    keypad(menu_win, TRUE);
 
-    for (int i = 0; i < n_choices; i++) {
+    while(1) {
+
+        int x = 2, y = 3;  // start coord values of 1st choice in menu
+        mvwprintw(menu_win, 1, 6, "☆ ~~ MAIN MENU ~~ ☆");
+        for (int i = 0; i < n_choices; i++) {
         if (highlight == i + 1) {
             wattron(menu_win, A_REVERSE);
             mvwprintw(menu_win, y, x, "%s", menu_choices[i]);
@@ -25,9 +50,42 @@ void print_menu(WINDOW *menu_win, int highlight, char **menu_choices, int n_choi
             mvwprintw(menu_win, y, x, "%s", menu_choices[i]);
         }
         y++;
+        }
+
+        int c = wgetch(menu_win);
+        switch (c) {
+            case KEY_UP:
+                if (highlight == 1) {
+                    highlight = n_choices;
+                } else {
+                    highlight--;
+                }
+                break;
+            case KEY_DOWN:
+                if (highlight == n_choices) {
+                    highlight = 1;
+                } else {
+                    highlight++;
+                }
+                break;
+            case 10:
+                choice = highlight;
+                break;
+            default:
+                // ADD CONTROLS!!
+                break;
+        }
+        
+        if (choice != 0) {
+            break;
+        }
+
     }
 
-    wrefresh(menu_win);
+    int c = wgetc(menu_win);
+    switch(c) {
+        
+    }
     
 }
 
@@ -128,6 +186,9 @@ void start_program(bool *cont) {
         }
         if (choice == 1) {
             printw("Yay!\n");
+            print_by_char(stdscr, "Let's get started!  ");
+            printw("~\\(≧▽≦)/~\n");
+            print_by_char(stdscr, "What whould you like to do today?");
             break;
         } else if (choice == 2) {
             printw("Ok, goodbey!\n");
