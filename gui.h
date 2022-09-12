@@ -21,6 +21,14 @@ void print_menu(WINDOW *menu_win, int highlight, char **menu_choices, int n_choi
 
 void print_yn_menu(WINDOW *win, int highlight, char **choices);
 
-int start_program();
+/* 
+* start_program: starts the program
+*
+* cont: an out parameter that indicates if they program should continue
+*
+* returns: an bool that signifies if yes or no was chosen and whether to 
+*           continue execution or quit 
+*/
+void start_program(bool *cont);
 
 #endif

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <ncurses.h>
 #include <string.h>
-#include <stdbool.h>
 #include "gui.h"
 
 
@@ -65,14 +64,17 @@ void print_yn_menu(WINDOW *win, int highlight, char **choices){
     wrefresh(win);
 }
 
-
 /* 
 * start_program: starts the program
+*
+* cont: an out parameter that indicates if they program should continue
 *
 * returns: an bool that signifies if yes or no was chosen and whether to 
 *           continue execution or quit 
 */
-int start_program() {
+void start_program(bool *cont) {
+
+    keypad(stdscr, TRUE);
 
     int highlight = 1; // move back to main?
     int choice = 0;
@@ -133,7 +135,14 @@ int start_program() {
         }
     }
 
+
+    if (choice == 1) {
+        *cont = TRUE;
+    } 
+
     refresh();
-    return (choice == 1);
+    keypad(stdscr, FALSE);
+
+    return;
 }
 
