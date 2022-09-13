@@ -17,9 +17,9 @@ void print_by_char(WINDOW *win, char *string);
 * highlight: a an integer to indicate which choice is selected
 *
 */
-void print_menu();
+void print_menu(bool return_to_submenu, int choice);
 
-void print_yn_menu(WINDOW *win, int highlight, char **choices);
+void print_yn_menu(WINDOW *win, int highlight, int *choice);
 
 /* 
 * start_program: starts the program
@@ -30,5 +30,7 @@ void print_yn_menu(WINDOW *win, int highlight, char **choices);
 *           continue execution or quit 
 */
 void start_program(bool *cont);
+
+void print_submenu(WINDOW *menu_win, int n_choices, int highlight, char **choices, int height, int header_pos, char *header, int *choice);
 
 #endif

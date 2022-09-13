@@ -21,7 +21,7 @@ int main() {
 
     
     if (continue_execution == TRUE) {
-        print_menu();
+        print_menu(FALSE, 0);
     }
     
     endwin();
