@@ -3,6 +3,7 @@
         "string.h": "c",
         "gui.h": "c",
         "stdio.h": "c",
-        "studyset.h": "c"
+        "studyset.h": "c",
+        "stdlib.h": "c"
     }
 }

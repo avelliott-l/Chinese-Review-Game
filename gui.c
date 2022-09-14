@@ -10,6 +10,13 @@
 *            allows the user to select an option, and runs 
 *            the corresponding code
 *
+*  return_to_submenu: a boolean value which is true us this function is called      
+*                     return to a submenu, and false if this function is called 
+*                     to return to the main menu
+*  choice: an integer indicating which menu option has been chosen -- always set
+*          to 0 if returning to main menu, if returning to submenu has a postive
+*          value
+*
 */
 void print_menu(bool return_to_submenu, int choice) {
 
@@ -30,21 +37,54 @@ void print_menu(bool return_to_submenu, int choice) {
     int startx = (COLS - width) / 2;
     int starty = (LINES - height) / 2;
     int highlight = 1;
-    // int choice = 0;  // keep track of which menu option is chosen
 
     WINDOW *menu_win = newwin(height, width, starty, startx);
     keypad(menu_win, TRUE);
 
+    /* create main menu */
     if (!return_to_submenu) {
         char *menu_header = "☆ ~~ MAIN MENU ~~ ☆";
         move(2, 0);
         print_by_char(stdscr, "> What would you like to do today?");
-        print_submenu(menu_win, n_choices, highlight, menu_choices, 3, 6, menu_header, &choice);    
+        print_menu_helper(menu_win, n_choices, highlight, menu_choices, 3, 6, menu_header, &choice);    
     }
-    
-
 
     if (choice == 1) {  // Review
+        // FILE *study_sets;
+        // study_sets = fopen("study_sets.txt", "r");
+        char study_sets[] = "study_sets.txt";
+        int n_choices;
+        //char *study_set_options[] = file_to_array(study_sets, MAX_FILE_NAME_LENGTH, TRUE, &n_choices);
+        char **study_set_options = file_to_array(study_sets, MAX_FILE_NAME_LENGTH, TRUE, &n_choices);
+        char *header = "☆ Pick a set ☆";
+        int header_pos = 6;
+        //n_choices = sizeof(study_set_options) / sizeof(char*);
+        if (n_choices == 1) {
+            header = "~No sets study sets added~";
+            header_pos = 2;
+        }
+        choice = 0;
+        clear();
+        print_menu_helper(menu_win, n_choices, highlight, study_set_options, 3, header_pos, header, &choice);
+
+        char *chosen = study_set_options[choice - 1];
+        if (strcmp(chosen, "> Return to main menu") == 0) {
+            delwin(menu_win);
+            clear();
+            print_menu(FALSE, 0);
+        } else {
+            sscanf(chosen, "> %s", chosen);
+
+            // printw("chosen: %s", chosen);
+            // refresh();
+            // getch();
+
+            review(chosen);
+        }
+
+        // how to pick choices
+
+        // make array one larger and add option to return to menu
 
     } else if (choice == 2) {  // Quiz me!
 
@@ -58,7 +98,7 @@ void print_menu(bool return_to_submenu, int choice) {
         n_choices = sizeof(add_choices) / sizeof(char*);
         choice = 0;
         clear();
-        print_submenu(menu_win, n_choices, highlight, add_choices, 4, 3, header, &choice);
+        print_menu_helper(menu_win, n_choices, highlight, add_choices, 4, 3, header, &choice);
 
         if (choice == 1) {  // Read from file
             //wclear(menu_win);
@@ -102,7 +142,7 @@ void print_by_char(WINDOW *win, char *string) {
     int len = strlen(string);
     for (int i = 0; i < len; i++){
         wprintw(win, "%c", string[i]);
-        delay_output(100);
+        delay_output(1);
         refresh();
     }
 }
@@ -112,8 +152,6 @@ void print_by_char(WINDOW *win, char *string) {
 *
 * cont: an out parameter that indicates if they program should continue
 *
-* returns: an bool that signifies if yes or no was chosen and whether to 
-*           continue execution or quit 
 */
 void start_program(bool *cont) {
 
@@ -152,11 +190,26 @@ void start_program(bool *cont) {
     return;
 }
 
-void print_submenu(WINDOW *menu_win, int n_choices, int highlight, char **choices, int height, int header_pos, char *header, int *choice){
+/*
+* print_menu_helper: helper function to print the menu display
+*
+* menu_win: the window to be printed, 
+* n_choices: the number of options in the menu
+* highlgiht: an int indicating the menu option selected and thus highlighted
+* choices: an array of strings when the menu options
+* height: an int indicating where in the window the first option will be printed
+* header_pos: an int indicating the x coord of the menu header
+* header: a string that is the header for the menu
+* choice: an out parameter indicating which menu option is chosen
+*
+*
+*/
+void print_menu_helper(WINDOW *menu_win, int n_choices, int highlight, char **choices, int height, int header_pos, char *header, int *choice) {
 
     refresh();
     int x = 2;  // distance of menu options from border
 
+    /* print menu */
     box(menu_win, 0, 0);
     mvwprintw(menu_win, 1, header_pos, "%s", header);
     keypad(menu_win, TRUE);
@@ -209,7 +262,13 @@ void print_submenu(WINDOW *menu_win, int n_choices, int highlight, char **choice
     wclear(menu_win);
 }
 
-
+/*
+* print_yn_menu: prints a yes/no answer prompt for the use
+*
+* win: the window to be printed on
+* highlight: an int indicating which option is selected
+* choice: an out parameter indicating which option was chosen
+*/
 void print_yn_menu(WINDOW *win, int highlight, int *choice){
 
     char *choices[] = {
@@ -269,5 +328,19 @@ void print_yn_menu(WINDOW *win, int highlight, int *choice){
         
 }
 
-
+/*
+* create_input_box: creates a box for user input
+*
+* width: width of box
+*
+* returns: a pointer to a window that contains the box
+*/
+WINDOW *create_input_box(int width) {
+    int y, x;
+    getyx(stdscr, y, x);
+    WINDOW *win = newwin(3, width, y, x);
+    box(win, 0, 0);
+    mvwprintw(win, 1, 2, ""); // move cursor into the box
+    return win;
+}
         

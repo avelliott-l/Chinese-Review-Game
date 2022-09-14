@@ -5,4 +5,5 @@ test: test.c
 	clang -Wall -g -o test -lncurses test.c
 
 clean:
-	rm -f chatbot test chatbot.dSYM test.dSYM
+	rm -f chatbot test 
+	rm -r chatbot.dSYM test.dSYM
