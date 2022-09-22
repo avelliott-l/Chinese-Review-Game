@@ -4,7 +4,6 @@
 #include <locale.h>
 #include "gui.h"
 
-
 int main() {
 
     /* include support for chinese characters */
@@ -27,4 +26,3 @@ int main() {
     endwin();
     
 }
-

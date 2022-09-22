@@ -1,9 +1,10 @@
+/* Functions to implement the GUI */
+
 #include <stdio.h>
 #include <ncurses.h>
 #include <string.h>
 #include "gui.h"
 #include "studyset.h"
-
 
 /*
 * print_menu: prints the menu window onto the terminal,
@@ -46,47 +47,54 @@ void print_menu(bool return_to_submenu, int choice) {
         char *menu_header = "☆ ~~ MAIN MENU ~~ ☆";
         move(2, 0);
         print_by_char(stdscr, "> What would you like to do today?");
-        print_menu_helper(menu_win, n_choices, highlight, menu_choices, 3, 6, menu_header, &choice);    
+        print_menu_helper(menu_win, n_choices, highlight, menu_choices, 3, 6, 
+                          menu_header, &choice);    
     }
 
     if (choice == 1) {  // Review
-        // FILE *study_sets;
-        // study_sets = fopen("study_sets.txt", "r");
+
+        /* create array to menu choices to print to menu */
         char study_sets[] = "study_sets.txt";
         int n_choices;
-        //char *study_set_options[] = file_to_array(study_sets, MAX_FILE_NAME_LENGTH, TRUE, &n_choices);
-        char **study_set_options = file_to_array(study_sets, MAX_FILE_NAME_LENGTH, TRUE, &n_choices);
+        char **study_set_options = file_to_array(study_sets, TRUE, &n_choices);
         char *header = "☆ Pick a set ☆";
         int header_pos = 6;
-        //n_choices = sizeof(study_set_options) / sizeof(char*);
+        
         if (n_choices == 1) {
             header = "~No sets study sets added~";
             header_pos = 2;
         }
+
         choice = 0;
         clear();
-        print_menu_helper(menu_win, n_choices, highlight, study_set_options, 3, header_pos, header, &choice);
+
+        print_menu_helper(menu_win, n_choices, highlight, study_set_options, 3, 
+                          header_pos, header, &choice);
 
         char *chosen = study_set_options[choice - 1];
-        if (strcmp(chosen, "> Return to main menu") == 0) {
+
+        /* return to main menu */
+        if (strcmp(chosen, "> Return to main menu") == 0) { 
             delwin(menu_win);
             clear();
             print_menu(FALSE, 0);
-        } else {
-            sscanf(chosen, "> %s", chosen);
 
-            // printw("chosen: %s", chosen);
-            // refresh();
-            // getch();
-
-            review(chosen);
+        /* open the selected study set for review */
+        } else {  
+            char filename[MAX_FILE_NAME_LENGTH + 4];
+            sscanf(chosen, "> %s", filename);
+            delwin(menu_win);
+            clear();
+            review(filename);
+            free_array(study_set_options, n_choices);
         }
 
-        // how to pick choices
-
-        // make array one larger and add option to return to menu
-
     } else if (choice == 2) {  // Quiz me!
+        printw("\n Function not yet implemented. Please choose again.");
+        refresh();
+        delay_output(1500);
+        clear();
+        print_menu(FALSE, 0);
 
     } else if (choice == 3) {  // Add a study set
         char *add_choices[] = {
@@ -107,6 +115,11 @@ void print_menu(bool return_to_submenu, int choice) {
             new_study_set();
 
         } else if (choice == 2) {  // Add manually
+            printw("\n Function not yet implemented. Please choose again.");
+            refresh();
+            delay_output(1500);
+            clear();
+            print_menu(TRUE, 3);
 
         } else if (choice == 3) {  // Return to main menu
             delwin(menu_win);
@@ -116,8 +129,18 @@ void print_menu(bool return_to_submenu, int choice) {
         };
 
     } else if (choice == 4) {  // View a study set
+        printw("\n Function not yet implemented. Please choose again.");
+        refresh();
+        delay_output(1500);
+        clear();
+        print_menu(FALSE, 0);
 
     } else if (choice == 5) {  // Delete a study set
+        printw("\n Function not yet implemented. Please choose again.");
+        refresh();
+        delay_output(1500);
+        clear();
+        print_menu(FALSE, 0);
 
     } else if (choice == 6) {  // Exit
         delwin(menu_win);
@@ -130,23 +153,6 @@ void print_menu(bool return_to_submenu, int choice) {
     
 }
 
-/*
-* print_by_char: prints a string out character by character to roughly 
-*                imitate typing
-*
-* win: the window the text will be printed onto
-* string: the text to be printed out
-*
-*/
-void print_by_char(WINDOW *win, char *string) {
-    int len = strlen(string);
-    for (int i = 0; i < len; i++){
-        wprintw(win, "%c", string[i]);
-        delay_output(1);
-        refresh();
-    }
-}
-
 /* 
 * start_program: starts the program
 *
@@ -157,11 +163,10 @@ void start_program(bool *cont) {
 
     keypad(stdscr, TRUE);
 
-    int highlight = 1; // move back to main?
+    int highlight = 1;
     int choice = 0;
 
     /* yes no option for user input */
-
     print_by_char(stdscr, "Hi! ");
     printw("~\\(≧▽≦)/~\n");
     delay_output(100);
@@ -172,7 +177,6 @@ void start_program(bool *cont) {
             printw("Yay!\n");
             print_by_char(stdscr, "Let's get started!  ");
             printw("~\\(≧▽≦)/~\n");
-            //print_by_char(stdscr, "What would you like to do today?");
         } else if (choice == 2) {
             printw("Ok, goodbye!\n");
             printw("\n\nPress any key to quit");
@@ -201,8 +205,6 @@ void start_program(bool *cont) {
 * header_pos: an int indicating the x coord of the menu header
 * header: a string that is the header for the menu
 * choice: an out parameter indicating which menu option is chosen
-*
-*
 */
 void print_menu_helper(WINDOW *menu_win, int n_choices, int highlight, char **choices, int height, int header_pos, char *header, int *choice) {
 
@@ -225,10 +227,10 @@ void print_menu_helper(WINDOW *menu_win, int n_choices, int highlight, char **ch
         } else {
             mvwprintw(menu_win, y, x, "%s", choices[i]);
         }
-        y++;
+        y++;  // change height so each menu option prints below the last
         }
 
-        wrefresh(menu_win); //
+        wrefresh(menu_win);
 
         int c = wgetch(menu_win);
         switch (c) {
@@ -286,7 +288,6 @@ void print_yn_menu(WINDOW *win, int highlight, int *choice){
         } else {
             mvwprintw(win, y, x + 2, "%s", choices[i]);
         }
-        // change position
     }
     wrefresh(win);
 
@@ -312,10 +313,10 @@ void print_yn_menu(WINDOW *win, int highlight, int *choice){
                 *choice = highlight;
                 break;
             default:
-                // mvprintw(10, 0, "Invalid character press");
-                // refresh();
+                // ADD CONTROLS
                 break;
         }
+
         if (*choice == 0) {
             int x, y;
             getyx(stdscr, y, x);
@@ -326,6 +327,23 @@ void print_yn_menu(WINDOW *win, int highlight, int *choice){
             move(0, 0);
         }
         
+}
+
+/*
+* print_by_char: prints a string out character by character to roughly 
+*                imitate typing
+*
+* win: the window the text will be printed onto
+* string: the text to be printed out
+*
+*/
+void print_by_char(WINDOW *win, char *string) {
+    int len = strlen(string);
+    for (int i = 0; i < len; i++){
+        wprintw(win, "%c", string[i]);
+        delay_output(50);
+        refresh();
+    }
 }
 
 /*
@@ -340,7 +358,7 @@ WINDOW *create_input_box(int width) {
     getyx(stdscr, y, x);
     WINDOW *win = newwin(3, width, y, x);
     box(win, 0, 0);
-    mvwprintw(win, 1, 2, ""); // move cursor into the box
+    mvwprintw(win, 1, 2, "");  // move cursor into the box
     return win;
 }
         

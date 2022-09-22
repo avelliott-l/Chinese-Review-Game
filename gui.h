@@ -1,22 +1,8 @@
-/*
-*
-*
-*
-*/
+/* Interface for actions related to the GUI */
 
 #ifndef GUI_H
 #define GUI_H
 #include <ncurses.h>
-
-/*
-* print_by_char: prints a string out character by character to roughly 
-*                imitate typing
-*
-* win: the window the text will be printed onto
-* string: the text to be printed out
-*
-*/
-void print_by_char(WINDOW *win, char *string);
 
 /*
 * print_menu: prints the menu window onto the terminal,
@@ -61,10 +47,18 @@ void start_program(bool *cont);
 * header_pos: an int indicating the x coord of the menu header
 * header: a string that is the header for the menu
 * choice: an out parameter indicating which menu option is chosen
-*
-*
 */
 void print_menu_helper(WINDOW *menu_win, int n_choices, int highlight, char **choices, int height, int header_pos, char *header, int *choice);
+
+/*
+* print_by_char: prints a string out character by character to roughly 
+*                imitate typing
+*
+* win: the window the text will be printed onto
+* string: the text to be printed out
+*
+*/
+void print_by_char(WINDOW *win, char *string);
 
 /*
 * create_input_box: creates a box for user input
